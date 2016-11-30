@@ -8,13 +8,13 @@ module.exports = function(app,io){
 	  console.log('a user connected', socket.id);
 
 	  // send a message to everyone (but the person who connected) when someone connects
-	  socket.broadcast.emit('user connected', 'someone joined');
+	  // socket.broadcast.emit('user connected', 'someone joined');
 
 	  // handler for a socket disconnect (why does this go within io.on? shouldn't it go in it's own separate function??)
 	  socket.on('disconnect', function(){
 	    console.log('user disconnected', socket.id);
 	    // send a message to everyone (but the person who disconnected) when someone disconnected
-	    socket.broadcast.emit('user disconnected', "someone left");
+	    // socket.broadcast.emit('user disconnected', "someone left");
 	  });
 
 	  // handler for when a chat message comes in from the app
@@ -24,10 +24,16 @@ module.exports = function(app,io){
 	    console.log(msg.roomid);
 	  });
 
-	  socket.on('subscribe', function(room) {
+	  // socket.io listener for client subscribe event, which is when a client asks to join a room
+	  socket.on('subscribe', function(msg) {
 
-	  	console.log('joined room ' + room);
-	  	socket.join(room);
+	  	console.log(msg.username + 'has joined room ' + msg.chatgroupId);
+	  	// broadcast to all clients in this room that this specific user has joined
+	  	socket.broadcast.to(msg.chatgroupId).emit('logged in', {username: msg.username, chatgroupId: msg.chatgroupId});
+	  	console.log("after system message emit");
+	  	// join the room
+	  	socket.join(msg.chatgroupId);
+	  	console.log("after socket join");
 	  });
 
 		// When the client emits the 'load' event, reply with the 
