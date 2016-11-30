@@ -20,8 +20,14 @@ module.exports = function(app,io){
 	  // handler for when a chat message comes in from the app
 	  socket.on('chat message', function(msg){
 	  	// send chat message to everyone, including who sent it
-	  	io.emit('chat message', msg);
-	    console.log('message: ' + msg);
+	  	io.to(msg.roomid).emit('chat message', msg);
+	    console.log(msg.roomid);
+	  });
+
+	  socket.on('subscribe', function(room) {
+
+	  	console.log('joined room ' + room);
+	  	socket.join(room);
 	  });
 
 		// When the client emits the 'load' event, reply with the 
