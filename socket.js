@@ -19,9 +19,11 @@ module.exports = function(app,io){
 
 	  // handler for when a chat message comes in from the app
 	  socket.on('chat message', function(msg){
-	  	// send chat message to everyone, including who sent it
-	  	io.sockets.in(msg.roomid).emit('chat message', msg);
-	    console.log(msg.roomid);
+	  	// send chat message to everyone except for who sent it
+	  	socket.broadcast.to(msg.messagerecipient_id).emit('chat message', msg);
+		// send chat message to everyone, including who sent it
+	  	//io.sockets.in(msg.messagerecipient_id).emit('chat message', msg);
+	    console.log(msg.messagerecipient_id);
 	  });
 
 	  // socket.io listener for client subscribe event, which is when a client asks to join a room
@@ -30,10 +32,9 @@ module.exports = function(app,io){
 	  	console.log(msg.username + 'has joined room ' + msg.chatgroupId);
 	  	// broadcast to all clients in this room that this specific user has joined
 	  	socket.broadcast.to(msg.chatgroupId).emit('logged in', {username: msg.username, chatgroupId: msg.chatgroupId});
-	  	console.log("after system message emit");
 	  	// join the room
 	  	socket.join(msg.chatgroupId);
-	  	console.log("after socket join");
+
 	  });
 
 		// When the client emits the 'load' event, reply with the 
