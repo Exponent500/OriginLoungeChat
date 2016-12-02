@@ -27,6 +27,10 @@ module.exports = function(app,io){
 	    
 	    console.log(users);
 
+	    // let all clients know that this client has logged out and send along the latest snapshot of users 
+	    // currently registered
+	    socket.broadcast.emit('logged out', {users:users, userLoggedOut:socket.userid});
+
 	  });
 
 	  // socket.io listener for when a chat message comes in from a client
