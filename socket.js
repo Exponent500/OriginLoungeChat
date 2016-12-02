@@ -1,16 +1,34 @@
 module.exports = function(app,io){
 
+	var users = [];
+	var user = {};
+
 	// Initialize a new socket.io application, named 'chat'
 	var chat = io.on('connection', function (socket) {
 
+	  socket.room = [];
+	  
 	  // show that a user connected when a connection event occurs
 	  console.log('a user connected', socket.id);
 
-	  // handler for a socket disconnect (why does this go within io.on? shouldn't it go in it's own separate function??)
+	  // handler for a client socket disconnect
 	  socket.on('disconnect', function(){
-	    console.log('user disconnected', socket.id);
-	    // send a message to everyone (but the person who disconnected) when someone disconnected
-	    // socket.broadcast.emit('user disconnected', "someone left");
+	    console.log('user disconnected', socket.userid);
+	    // grab the index where the specific user's id is located within the global users array
+	    var index = users.indexOf(socket.userid);
+	    // remove said user id from the global users array
+	    if (index > -1) {
+	    	users.splice(index,1);
+	    }
+
+	    // remove user from all rooms they were in
+	    for (var i = 0; i < socket.room.length; i++) {
+	    	socket.leave(socket.room[i]);	
+	    }
+	    
+	    // socket.disconnect();
+	    console.log(users);
+
 	  });
 
 	  // handler for when a chat message comes in from the app
@@ -23,13 +41,29 @@ module.exports = function(app,io){
 	  });
 
 	  // socket.io listener for client subscribe event, which is when a client asks to join a room
-	  socket.on('subscribe', function(msg) {
+	  socket.on('add user', function(msg) {
+	
+		// assign the userid to the socket object
+	  	socket.userid = msg.userid;
+	  	// add userid to the list of users
+	  	users.push(msg.userid);
+	  	
+	  	// add the user to a room for each chat he/she is a part of
+	  	for (var i = 0; i < msg.chatGroups.length; i++) {
+	  		// add each room to the socket object
+	  		socket.room[i] = msg.chatGroups[i]._id;
+	  		//join each room
+	  		socket.join(msg.chatGroups[i]._id);
+	  	}
 
-	  	console.log(msg.username + 'has joined room ' + msg.chatid);
+	  	console.log(users);
+	  	console.log(socket.userid);
+	  	console.log(socket.room);
+
+	  	// send all clients the notification that this client has logged in
+	  	io.sockets.emit('logged in', users);
 	  	// broadcast to all clients in this room that this specific user has joined
-	  	socket.broadcast.to(msg.chatid).emit('logged in', {username: msg.username, chatgroupId: msg.chatid});
-	  	// join the room
-	  	socket.join(msg.chatid);
+	  	//socket.broadcast.to(msg.chatid).emit('logged in', {username: msg.username, chatgroupId: msg.chatid});
 
 	  });
 
