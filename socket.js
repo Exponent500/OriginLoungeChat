@@ -40,6 +40,12 @@ module.exports = function(app,io){
 	    console.log(msg.chatid);
 	  });
 
+	  socket.on('send file info', function(msg){
+
+	  	// send all clients this file, including the client who sent the file
+	  	socket.broadcast.to(msg.chatid).emit('receive file info', msg);
+	  });
+
 	  // socket.io listener that adds client to local users list and all rooms the client is 
 	  // subscribed to. It also lets all other clients know that it has logged in.
 	  socket.on('add user', function(msg) {
