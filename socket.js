@@ -41,7 +41,7 @@ module.exports = function(app,io){
 	  });
 
 	  socket.on('send file info', function(msg){
-
+	  	console.log("in 'send file info' listenter");
 	  	// send all clients this file, including the client who sent the file
 	  	socket.broadcast.to(msg.chatid).emit('receive file info', msg);
 	  });
@@ -52,7 +52,7 @@ module.exports = function(app,io){
 	
 		// assign the userid to the socket object
 	  	socket.userid = msg.userid;
-	  	// add userid to the list of users
+	  	// add userid to the list of users 
 	  	users.push(msg.userid);
 	  	
 	  	// add the user to a room for each chat he/she is a part of
@@ -71,6 +71,23 @@ module.exports = function(app,io){
 	  	// list of users
 	  	io.sockets.emit('logged in', {users:users, userLoggedIn: msg.userid});
 
+	  });
+
+	  socket.on('create chatroom notification', function(msg){
+	  	console.log(msg);
+	  	socket.room.push(msg._id);
+	  	console.log(socket.room);
+	  	socket.join(msg._id);
+	  	socket.broadcast.emit('notify chatroom created', msg);
+
+	  });
+
+	  socket.on('create chatroom', function(msg){
+	  	console.log(msg);
+	  	socket.room.push(msg._id);
+	  	console.log(socket.room);
+	  	socket.join(msg._id);
+	  	socket.emit('chatroom created', msg);
 	  });
 
 	});
