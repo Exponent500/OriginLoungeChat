@@ -46,7 +46,7 @@ module.exports = function(app,io){
 	  });
 
 	  // socket.io listener for when a file has been sent from a client
-	  socket.on('send file info', function(msg){
+	  socket.on('send file info', function(msg) {
 	  	console.log("in 'send file info' listenter");
 	  	// send file to all clients except the client that sent the message
 	  	socket.broadcast.to(msg.chatid).emit('receive file info', msg);
@@ -81,7 +81,7 @@ module.exports = function(app,io){
 
 	  // socket.io listener that enables a client to notify other clients that it added them to a new chat room
 	  // and adds the client that created said room, to said room.
-	  socket.on('create chatroom notification', function(msg){
+	  socket.on('create chatroom notification', function(msg) {
 	  	console.log(msg);
 	  	socket.room.push(msg._id);
 	  	console.log(socket.room);
@@ -92,7 +92,7 @@ module.exports = function(app,io){
 	  });
 
 	  // socket.io listener that enables clients to add themselves to the new room that they are a part of (that was created by another client)
-	  socket.on('create chatroom', function(msg){
+	  socket.on('create chatroom', function(msg) {
 	  	console.log(msg);
 	  	socket.room.push(msg._id);
 	  	console.log(socket.room);
