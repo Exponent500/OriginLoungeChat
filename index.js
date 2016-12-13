@@ -7,10 +7,12 @@ var io = require('socket.io')(app);
 // Require the socket file, and pass
 // the app and io as arguments to the returned function.
 
+var port = process.env.PORT || 3002;
+
 require('./socket')(app, io);
 
 // make http server listen on port 3002
-app.listen(3002, function(){
+app.listen(port, function(){
   console.log('listening on *:3002');
 });
 
